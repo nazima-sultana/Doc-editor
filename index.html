@@ -1,13 +1,188 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
 
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InAmigos Doc Editor</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; background: #f0ede4; }
+  .tabs { display: flex; background: #2c5f2e; }
+  .tab { flex: 1; padding: 14px; text-align: center; color: white; cursor: pointer; font-weight: bold; }
+  .tab.active { background: #1a3d1c; border-bottom: 3px solid #f5c518; }
+  .container { display: flex; gap: 16px; padding: 16px; flex-wrap: wrap; }
+  .form-panel { flex: 1; min-width: 280px; background: white; padding: 20px; border-radius: 8px; }
+  .form-panel h3 { margin-bottom: 16px; color: #2c5f2e; }
+  label { display: block; margin-top: 12px; font-size: 13px; color: #555; font-weight: bold; }
+  input { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+  .preview-panel { flex: 1.5; min-width: 300px; }
+  .letter { background: #f5f0e8; padding: 40px; border-radius: 8px; font-size: 13px; line-height: 1.8; color: #222; }
+  .letter-header { text-align: right; font-size: 11px; margin-bottom: 10px; color: #444; }
+  .letter-title { text-align: center; font-size: 20px; font-weight: bold; margin: 20px 0; }
+  .letter-date { text-align: right; margin-bottom: 16px; }
+  .letter-body p { margin-bottom: 12px; }
+  .letter-body ul { margin-left: 20px; margin-bottom: 12px; }
+  .cert { background: #f5f0e8; padding: 40px; border-radius: 8px; text-align: center; border: 8px double #2c5f2e; }
+  .cert-org { font-size: 22px; font-weight: bold; color: #2c5f2e; margin-bottom: 4px; }
+  .cert-tagline { font-size: 12px; color: #666; margin-bottom: 30px; }
+  .cert-title { font-size: 28px; font-weight: bold; color: #1a3d1c; margin-bottom: 24px; letter-spacing: 2px; }
+  .cert-body { font-size: 15px; line-height: 2; color: #333; margin-bottom: 30px; }
+  .cert-name { font-size: 24px; font-weight: bold; color: #2c5f2e; font-style: italic; }
+  .sign-area { margin-top: 40px; display: flex; justify-content: space-between; }
+  .sign-box { text-align: center; border-top: 1px solid #333; padding-top: 8px; font-size: 12px; width: 160px; }
+  .btn { display: block; width: 100%; margin-top: 20px; padding: 12px; background: #2c5f2e; color: white; border: none; border-radius: 6px; font-size: 15px; cursor: pointer; }
+  .btn:hover { background: #1a3d1c; }
+  .hidden { display: none; }
+  @media print {
+    .tabs, .form-panel, .btn { display: none !important; }
+    .preview-panel { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('offer')">📄 Offer Letter</div>
+  <div class="tab" onclick="switchTab('cert')">🏆 Certificate</div>
+</div>
+
+<div class="container">
+  <!-- OFFER LETTER FORM -->
+  <div class="form-panel" id="offerForm">
+    <h3>Offer Letter Details</h3>
+    <label>Candidate Name</label>
+    <input type="text" id="o_name" oninput="updateOffer()" placeholder="e.g. Shristi">
+    <label>Date</label>
+    <input type="date" id="o_date" oninput="updateOffer()">
+    <label>Internship Role</label>
+    <input type="text" id="o_role" oninput="updateOffer()" placeholder="e.g. Graphic Designing">
+    <label>Duration</label>
+    <input type="text" id="o_duration" oninput="updateOffer()" placeholder="e.g. Two Weeks">
+    <label>HR Head Name</label>
+    <input type="text" id="o_hr_name" oninput="updateOffer()" placeholder="e.g. Ms. Iniya R">
+    <label>HR Designation</label>
+    <input type="text" id="o_hr_desig" oninput="updateOffer()" placeholder="e.g. HR Operations Lead">
+    <button class="btn" onclick="window.print()">⬇️ Download as PDF</button>
+  </div>
+
+  <!-- OFFER LETTER PREVIEW -->
+  <div class="preview-panel" id="offerPreview">
+    <div class="letter">
+      <div class="letter-header">
+        Registration Number – U85300CT2020NPL010641<br>
+        CSR - 1 Registered - CSR00083159
+      </div>
+      <hr style="margin-bottom:16px;">
+      <div class="letter-date" id="p_date">Date: —</div>
+      <div class="letter-title">Offer Letter</div>
+      <div class="letter-body">
+        <p>Dear <strong id="p_name">—</strong>,</p>
+        <p>We are pleased to offer you the internship position of <strong id="p_role">—</strong> at InAmigos Foundation. Below are the details of your internship:</p>
+        <p><strong>Duration of Internship:</strong> <span id="p_duration">—</span></p>
+        <p><strong>Working Hours:</strong> The working hours for this internship are flexible, allowing you to adjust according to your availability.</p>
+        <p><strong>Location:</strong> This internship generally allows for remote work. However, if the role requires fieldwork, you will be expected to attend fieldwork at a site near your location.</p>
+        <p><strong>Responsibilities</strong></p>
+        <ul>
+          <li>Your primary role will be related to the field of your chosen internship.</li>
+          <li>Attend team meetings and actively participate in group discussions.</li>
+          <li>Complete tasks assigned by your superiors in a timely manner.</li>
+          <li>Maintain confidentiality and professionalism at all times.</li>
+        </ul>
+        <p><strong>Stipend:</strong> The stipend will be 20% of the donation raised by you during your internship period.</p>
+        <p>Fundraising is not mandatory for achieving a completion certificate. It is an optional task.</p>
+        <p style="margin-top:24px;"><strong>Authorized Signatory</strong><br>
+        Name: <span id="p_hr_name">—</span><br>
+        Designation: <span id="p_hr_desig">—</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CERTIFICATE FORM -->
+  <div class="form-panel hidden" id="certForm">
+    <h3>Certificate Details</h3>
+    <label>Candidate Name</label>
+    <input type="text" id="c_name" oninput="updateCert()" placeholder="e.g. Shristi">
+    <label>Internship Role</label>
+    <input type="text" id="c_role" oninput="updateCert()" placeholder="e.g. Graphic Designing">
+    <label>Duration</label>
+    <input type="text" id="c_duration" oninput="updateCert()" placeholder="e.g. Two Weeks">
+    <label>Start Date</label>
+    <input type="date" id="c_start" oninput="updateCert()">
+    <label>End Date</label>
+    <input type="date" id="c_end" oninput="updateCert()">
+    <label>Signatory Name</label>
+    <input type="text" id="c_sign_name" oninput="updateCert()" placeholder="e.g. Ms. Shiwani">
+    <label>Signatory Designation</label>
+    <input type="text" id="c_sign_desig" oninput="updateCert()" placeholder="e.g. HR Operations Lead">
+    <button class="btn" onclick="window.print()">⬇️ Download as PDF</button>
+  </div>
+
+  <!-- CERTIFICATE PREVIEW -->
+  <div class="preview-panel hidden" id="certPreview">
+    <div class="cert">
+      <div class="cert-org">InAmigos Foundation</div>
+      <div class="cert-tagline">Uniting Minds For Change</div>
+      <div class="cert-title">CERTIFICATE OF COMPLETION</div>
+      <div class="cert-body">
+        This is to certify that<br>
+        <span class="cert-name" id="cp_name">—</span><br>
+        has successfully completed a <strong><span id="cp_duration">—</span></strong> internship<br>
+        in the field of <strong><span id="cp_role">—</span></strong><br>
+        at <strong>InAmigos Foundation</strong><br>
+        from <strong><span id="cp_start">—</span></strong> to <strong><span id="cp_end">—</span></strong>.<br><br>
+        We wish them all the best in their future endeavors.
+      </div>
+      <div class="sign-area">
+        <div class="sign-box">
+          Registration No.<br>U85300CT2020NPL010641
+        </div>
+        <div class="sign-box">
+          <span id="cp_sign_name">—</span><br>
+          <span id="cp_sign_desig">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', (tab==='offer'&&i===0)||(tab==='cert'&&i===1)));
+  document.getElementById('offerForm').classList.toggle('hidden', tab !== 'offer');
+  document.getElementById('offerPreview').classList.toggle('hidden', tab !== 'offer');
+  document.getElementById('certForm').classList.toggle('hidden', tab !== 'cert');
+  document.getElementById('certPreview').classList.toggle('hidden', tab !== 'cert');
+}
+
+function fmt(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-IN', {day:'2-digit', month:'long', year:'numeric'});
+}
+
+function updateOffer() {
+  document.getElementById('p_name').textContent = document.getElementById('o_name').value || '—';
+  document.getElementById('p_role').textContent = document.getElementById('o_role').value || '—';
+  document.getElementById('p_duration').textContent = document.getElementById('o_duration').value || '—';
+  document.getElementById('p_date').textContent = 'Date: ' + fmt(document.getElementById('o_date').value);
+  document.getElementById('p_hr_name').textContent = document.getElementById('o_hr_name').value || '—';
+  document.getElementById('p_hr_desig').textContent = document.getElementById('o_hr_desig').value || '—';
+}
+
+function updateCert() {
+  document.getElementById('cp_name').textContent = document.getElementById('c_name').value || '—';
+  document.getElementById('cp_role').textContent = document.getElementById('c_role').value || '—';
+  document.getElementById('cp_duration').textContent = document.getElementById('c_duration').value || '—';
+  document.getElementById('cp_start').textContent = fmt(document.getElementById('c_start').value);
+  document.getElementById('cp_end').textContent = fmt(document.getElementById('c_end').value);
+  document.getElementById('cp_sign_name').textContent = document.getElementById('c_sign_name').value || '—';
+  document.getElementById('cp_sign_desig').textContent = document.getElementById('c_sign_desig').value || '—';
+}
+</script>
+</body>
+</html>
+```
+
+Paste karke **Commit changes** karo — Vercel automatically redeploy kar dega! ✅
